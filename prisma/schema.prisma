@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Highlight {
+  id          String   @id @default(cuid())
+  glaspId     String?  @unique
+  url         String
+  title       String
+  author      String?
+  createdAt   DateTime
+  highlightText String
+  note        String?
+  tags        String   // JSON array of tags
+  sourceDomain String
+  syncedAt    DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  embeddings  Embedding[]
+  ideaHighlights IdeaHighlight[]
+  draftHighlights DraftHighlight[]
+
+  @@index([sourceDomain])
+  @@index([createdAt])
+  @@index([syncedAt])
+}
+
+model Embedding {
+  id          String   @id @default(cuid())
+  highlightId String
+  embedding   String   // JSON array of numbers
+  model       String   @default("text-embedding-3-small")
+  createdAt   DateTime @default(now())
+
+  highlight   Highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade)
+
+  @@index([highlightId])
+}
+
+model Idea {
+  id                String   @id @default(cuid())
+  title             String
+  oneSentenceHook   String
+  whyNow            String
+  targetAudience    String
+  outlineBullets    String   // JSON array
+  riskOfGeneric     Float
+  noveltyScoreGuess Float
+  createdAt         DateTime @default(now())
+  generationBatch   Int      // Track which generation batch this came from
+
+  // Relations
+  ideaHighlights    IdeaHighlight[]
+  curatorScores     CuratorScore?
+  draft             Draft?
+
+  @@index([createdAt])
+  @@index([generationBatch])
+}
+
+model IdeaHighlight {
+  id        String   @id @default(cuid())
+  ideaId    String
+  highlightId String
+
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  highlight Highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade)
+
+  @@unique([ideaId, highlightId])
+  @@index([ideaId])
+  @@index([highlightId])
+}
+
+model CuratorScore {
+  id              String   @id @default(cuid())
+  ideaId          String   @unique
+  groundedness    Float
+  originality     Float
+  brandFit        Float
+  diversity       Float
+  clarity         Float
+  averageScore    Float
+  feedback        String?
+  shortlisted     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  idea            Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@index([shortlisted])
+  @@index([averageScore])
+}
+
+model Draft {
+  id              String   @id @default(cuid())
+  ideaId          String   @unique
+  detailedOutline String   // JSON structure
+  fullDraft       String
+  wordCount       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Repurpose pack
+  alternativeHooks String  // JSON array
+  socialPostBullets String // JSON array
+
+  idea            Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  draftHighlights DraftHighlight[]
+
+  @@index([createdAt])
+}
+
+model DraftHighlight {
+  id        String   @id @default(cuid())
+  draftId   String
+  highlightId String
+
+  draft     Draft    @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  highlight Highlight @relation(fields: [highlightId], references: [id], onDelete: Cascade)
+
+  @@unique([draftId, highlightId])
+  @@index([draftId])
+  @@index([highlightId])
+}
+
+model SyncLog {
+  id          String   @id @default(cuid())
+  syncType    String   // "full" | "incremental"
+  highlightsCount Int
+  status      String   // "success" | "error"
+  errorMessage String?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([startedAt])
+}
+

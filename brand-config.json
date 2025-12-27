@@ -1,0 +1,51 @@
+{
+  "profile": "Principal PM, AI services + infrastructure",
+  "description": "A senior product manager focused on AI services and infrastructure, with expertise in building scalable systems and strategic product development.",
+  "topics": [
+    "AI infrastructure",
+    "AI",
+    "Generative AI",
+    "Product Management",
+    "Business",
+    "Strategy",
+    "User Experience",
+    "Value Chain"
+  ],
+  "brandKeywords": [
+    "AI",
+    "infrastructure",
+    "product",
+    "service",
+    "PM",
+    "strategy",
+    "scalable",
+    "enterprise",
+    "architecture",
+    "platform"
+  ],
+  "writingStyle": {
+    "tone": "Professional yet accessible",
+    "voice": "Authoritative but approachable",
+    "length": "1200-1800 words",
+    "structure": "Clear introduction, well-organized sections with actionable insights, strong conclusion",
+    "examples": [
+      "Use concrete examples and case studies",
+      "Balance technical depth with business context",
+      "Focus on practical applications and real-world scenarios"
+    ]
+  },
+  "targetAudience": [
+    "Product managers",
+    "Engineering leaders",
+    "AI/ML practitioners",
+    "Technical decision makers",
+    "Business strategists"
+  ],
+  "contentPrinciples": [
+    "Grounded in real-world experience",
+    "Actionable insights over theory",
+    "Balanced perspective on technology and business",
+    "Focus on scalability and long-term thinking"
+  ]
+}
+
