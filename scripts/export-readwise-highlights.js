@@ -2,19 +2,30 @@
  * Simple Readwise Highlights Export Script
  * 
  * Usage:
- *   1. Replace YOUR_ACCESS_TOKEN_HERE with your actual Readwise access token
+ *   1. Set READWISE_ACCESS_TOKEN environment variable
  *   2. Run: node scripts/export-readwise-highlights.js
+ * 
+ * Example:
+ *   READWISE_ACCESS_TOKEN=your_token_here node scripts/export-readwise-highlights.js
+ * 
+ * Or add to .env file:
+ *   READWISE_ACCESS_TOKEN=your_token_here
  * 
  * This script exports all your highlights from Readwise and saves them to a JSON file.
  * 
  * API Reference: https://readwise.io/api_deets
  * Get your token: https://readwise.io/access_token
+ * 
+ * SECURITY: Never hard-code tokens in this file. Always use environment variables.
  */
 
+// Load environment variables from .env file if available
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
 // ============================================
-// CONFIGURATION - Replace with your token
+// CONFIGURATION - Read from environment variable
 // ============================================
-const ACCESS_TOKEN = 'brlwRelcWHIOe0YdDrBisCoRs607vUKJEKVS3rnaTqtN9ISpi8';
+const ACCESS_TOKEN = process.env.READWISE_ACCESS_TOKEN || '';
 
 // ============================================
 // Script Configuration
@@ -35,16 +46,21 @@ async function sleep(ms) {
 
 async function exportHighlights() {
   // Validate token
-  if (!ACCESS_TOKEN || ACCESS_TOKEN === 'YOUR_ACCESS_TOKEN_HERE') {
-    console.error('❌ ERROR: Please set your Readwise access token!');
+  if (!ACCESS_TOKEN || ACCESS_TOKEN.trim() === '') {
+    console.error('❌ ERROR: READWISE_ACCESS_TOKEN environment variable is not set!');
     console.error('');
-    console.error('Edit this file and replace YOUR_ACCESS_TOKEN_HERE with your actual token.');
-    console.error('You can find your access token at: https://readwise.io/access_token');
+    console.error('Set your token in one of these ways:');
+    console.error('1. Add to .env file: READWISE_ACCESS_TOKEN=your_token_here');
+    console.error('2. Set environment variable: export READWISE_ACCESS_TOKEN=your_token');
+    console.error('3. Run with inline: READWISE_ACCESS_TOKEN=your_token node scripts/export-readwise-highlights.js');
+    console.error('');
+    console.error('Get your token from: https://readwise.io/access_token');
     process.exit(1);
   }
 
   console.log('🚀 Starting Readwise highlights export...');
-  console.log(`📝 Token: ${ACCESS_TOKEN.substring(0, 10)}...${ACCESS_TOKEN.substring(ACCESS_TOKEN.length - 4)}`);
+  // Only show partial token for verification (first 4 chars, last 4 chars)
+  console.log(`📝 Token: ${ACCESS_TOKEN.substring(0, 4)}...${ACCESS_TOKEN.substring(ACCESS_TOKEN.length - 4)}`);
   console.log(`⏱️  Rate limit: 20 requests/minute (adding ${RATE_LIMIT_DELAY/1000}s delay between requests)`);
   console.log('');
 
